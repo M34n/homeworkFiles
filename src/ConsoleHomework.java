@@ -1,6 +1,10 @@
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.*;
+import java.util.zip.*;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
@@ -41,6 +45,26 @@ public class ConsoleHomework {
                         System.out.println("Directory contains " + countedFiles + " files");
                     }
                     break;
+                case "zip":
+                    Path zipPath;
+                    if (parts[1].charAt(0) == 'C') {
+                        zipPath = Paths.get(parts[1]);
+                    } else {
+                        zipPath = Paths.get(path.toString(), parts[1]);
+                    }
+                    if (Files.exists(zipPath) && parts.length > 2) {
+                        String sourceFile = zipPath.toString();
+                        FileOutputStream fos = new FileOutputStream(path.toString() + "\\" + parts[2] + ".zip");
+                        ZipOutputStream zipOut = new ZipOutputStream(fos);
+                        File fileToZip = new File(sourceFile);
+                        zipFile(fileToZip, fileToZip.getName(), zipOut);
+                        zipOut.close();
+                        fos.close();
+                    } else {
+                        System.out.println("Invalid source or target path!");
+                    }
+                case "unzip":
+                    unzipFile(parts);
                 default:
                     System.out.println("Unknown command");
             }
@@ -150,7 +174,44 @@ public class ConsoleHomework {
     }
 
 
-    private static void zip (String[] parts) throws IOException {
+    private static void zipFile(File fileToZip, String fileName, ZipOutputStream zipOut) throws IOException {
 
+        if (fileToZip.isDirectory()) {
+            File[] children = fileToZip.listFiles();
+            for (File childFile : children) {
+                zipFile(childFile, fileName + "/" + childFile.getName(), zipOut);
+            }
+            return;
+        }
+        FileInputStream fis = new FileInputStream(fileToZip);
+        ZipEntry zipEntry = new ZipEntry(fileName);
+        zipOut.putNextEntry(zipEntry);
+        byte[] bytes = new byte[1024];
+        int length;
+        while ((length = fis.read(bytes)) >= 0) {
+            zipOut.write(bytes, 0, length);
+        }
+        fis.close();
+    }
+
+    private static void unzipFile(String parts[]) throws IOException {
+
+        String fileZip = path.toString() + "\\" + parts[1] + ".zip";
+        byte[] buffer = new byte[1024];
+        ZipInputStream zis = new ZipInputStream(new FileInputStream(fileZip));
+        ZipEntry zipEntry = zis.getNextEntry();
+        while (zipEntry != null) {
+            String fileName = zipEntry.getName();
+            File newFile = new File(path.toString() + "\\" + fileName);
+            FileOutputStream fos = new FileOutputStream(newFile);
+            int len;
+            while ((len = zis.read(buffer)) > 0) {
+                fos.write(buffer, 0, len);
+            }
+            fos.close();
+            zipEntry = zis.getNextEntry();
+        }
+        zis.closeEntry();
+        zis.close();
     }
 }
