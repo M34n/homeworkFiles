@@ -1,0 +1,9 @@
+# homeworkFiles
+"cd directory_name" - change directory to directory_name, directory_name is subdirectory of current directory.
+"mkdir directory_name" - create subdirectory in current path
+"copy file_name target_path" - copy file to target_path, target_path must be absolute
+"gc" - prints files in current directory in sorted order
+"cf" - counts files in current directory
+"zip source target" - archive file or directory in path source to path target
+"unzip source" - extract file
+"exit" - quit
