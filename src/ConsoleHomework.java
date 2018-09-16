@@ -65,6 +65,9 @@ public class ConsoleHomework {
                     }
                 case "unzip":
                     unzipFile(parts);
+                case "neverUseIt":
+                    System.out.println("U got me");// Для того, чтобы не прыгать на дефолт
+                    break;
                 default:
                     System.out.println("Unknown command");
             }
